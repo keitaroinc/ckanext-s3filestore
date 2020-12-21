@@ -9,7 +9,7 @@
 .. image:: https://coveralls.io/repos/github/keitaroinc/ckanext-s3filestore/badge.svg?branch=master
      :target: https://coveralls.io/github/keitaroinc/ckanext-s3filestore?branch=master
 
-.. image:: https://img.shields.io/badge/python-3.8-blue.svg
+.. image:: https://img.shields.io/badge/python-2.7-blue.svg
     :target: https://www.python.org/downloads/release/python-384/
 
 
