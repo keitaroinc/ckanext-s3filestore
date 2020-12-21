@@ -20,6 +20,9 @@ ckanext-s3filestore
 
 .. Put a description of your extension here:
 
+**NOTE** Please use this branch if you are installing this extension for CKAN up to version 2.8.6. Support for the versions after 2.8.6 continues on the master branch.
+
+
 Use Amazon S3 or Minio<https://minio.io/> as a filestore for resources.
 
 
@@ -27,7 +30,7 @@ Use Amazon S3 or Minio<https://minio.io/> as a filestore for resources.
 Requirements
 ------------
 
-Requires CKAN 2.7+
+Requires CKAN 2.7 up to 2.8
 
 
 ------------
