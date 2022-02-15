@@ -9,7 +9,7 @@ from botocore.exceptions import ClientError
 from botocore.client import Config
 
 from ckantoolkit import config as ckan_config
-from ckantoolkit import _, request, c, g
+from ckantoolkit import _, request, c
 import ckantoolkit as toolkit
 import ckan.logic as logic
 import ckan.lib.base as base
@@ -111,8 +111,8 @@ def filesystem_resource_download(package_type, id, resource_id, filename=None):
     context = {
         u'model': model,
         u'session': model.Session,
-        u'user': g.user,
-        u'auth_user_obj': g.userobj
+        u'user': c.user,
+        u'auth_user_obj': c.userobj
     }
     preview = request.args.get(u'preview', False)
 
