@@ -69,13 +69,23 @@ class S3Controller(base.BaseController):
                                    config=Config(signature_version=signature,
                                                  s3={'addressing_style': addressing_style}),
                                    region_name=region)
-                url = client.generate_presigned_url(ClientMethod='get_object',
-                                                    Params={'Bucket': bucket.name,
-                                                            'Key': key_path,
-                                                            'ResponseContentDisposition':
-                                                                'attachment; filename=' + filename
-                                                            },
-                                                    ExpiresIn=60)
+
+                preview = request.params(u'preview', False)
+
+                if preview:
+                    url = client.generate_presigned_url(ClientMethod='get_object',
+                                                        Params={'Bucket': bucket.name,
+                                                                'Key': key_path
+                                                                },
+                                                        ExpiresIn=60)
+                else:
+                    url = client.generate_presigned_url(ClientMethod='get_object',
+                                                        Params={'Bucket': bucket.name,
+                                                                'Key': key_path,
+                                                                'ResponseContentDisposition':
+                                                                    'attachment; filename=' + filename
+                                                                },
+                                                        ExpiresIn=60)
                 redirect(url)
 
             except ClientError as ex:
