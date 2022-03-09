@@ -70,7 +70,7 @@ class S3Controller(base.BaseController):
                                                  s3={'addressing_style': addressing_style}),
                                    region_name=region)
 
-                preview = request.params(u'preview', False)
+                preview = request.GET.get(u'preview', False)
 
                 if preview:
                     url = client.generate_presigned_url(ClientMethod='get_object',
