@@ -37,16 +37,7 @@ pip install -r dev-requirements.txt
 cd -
 
 echo "Setting up Minio..."
-docker run -it \
-    -d --name minio \
-    --publish 9000:9000 --publish 9001:9001 \
-    -e "MINIO_ROOT_USER=username" \
-    -e "MINIO_ROOT_PASSWORD=password" \
-    -e "MINIO_SERVER_ACCESS_KEY=test-access-key" \
-    -e "MINIO_SERVER_SECRET_KEY=test-secret-key" \
-    -e "MINIO_REGION_NAME=us-east-1" \
-    -e "MINIO_DEFAULT_BUCKETS=test-bucket:public" \
-    bitnami/minio:latest
+docker run -it -d --name minio --publish 9000:9000 --env MINIO_ACCESS_KEY="test-access-key" --env MINIO_SECRET_KEY="test-secret-key" --env MINIO_REGION_NAME='us-east-1' --env MINIO_DEFAULT_BUCKETS='test-bucket:public' bitnami/minio:2021.3.4
 
 echo "Creating the PostgreSQL users and databases..."
 psql -h localhost -U postgres -c "CREATE USER ckan_default WITH PASSWORD 'pass';"
