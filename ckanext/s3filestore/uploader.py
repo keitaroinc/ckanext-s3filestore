@@ -230,7 +230,8 @@ class S3Uploader(BaseS3Uploader):
 
         if not self.storage_path:
             return
-        if isinstance(self.upload_field_storage, ALLOWED_UPLOAD_TYPES):
+        if isinstance(self.upload_field_storage, ALLOWED_UPLOAD_TYPES) \
+                and self.upload_field_storage.filename:
             self.filename = self.upload_field_storage.filename
             self.filename = str(datetime.datetime.utcnow()) + self.filename
             self.filename = munge.munge_filename_legacy(self.filename)
