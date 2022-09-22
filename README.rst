@@ -119,6 +119,9 @@ To upload all local resources located in `ckan.storage_path` location dir to the
 
     ckan -c /etc/ckan/default/ckan.ini s3-upload
 
+To test AWS S3 connection by adding and deleting a single text file
+
+    ckan -c /etc/ckan/default/ckan.ini s3-test-connection
 
 ------------------------
 Development Installation

@@ -1,4 +1,4 @@
-
+from io import StringIO
 import os
 import click
 
@@ -81,3 +81,34 @@ def upload_resources():
             len(uploaded_resources)),
         fg=u'green',
         bold=True)
+
+
+@click.command(u's3-test-connection', short_help=u'Test connection to AWS S3')
+def upload_resources():
+    bucket_name = config.get('ckanext.s3filestore.aws_bucket_name')
+    acl = config.get('ckanext.s3filestore.acl', 'public-read')
+    
+    click.secho('Testing AWS S3 connection', fg=u'green', bold=True)
+
+    uploader = BaseS3Uploader()
+    s3_connection = uploader.get_s3_resource()
+    buf = StringIO('Testing S3 connection')
+
+    try:
+        s3_object = s3_connection.Object(bucket_name, 'testNN.text')
+
+        s3_object.put(
+            Body=buf.getvalue(),
+            ACL=acl,
+            ContentType='text/plain'
+        )
+    except Exception as e:
+        error = 'Failed to create S3 Object: {}'.format(e)
+        click.secho(error, fg=u'red', bold=True)
+        raise click.Abort()
+
+    click.secho('S3 Object created', fg=u'green', bold=True)
+    s3_object.delete()
+    click.secho('S3 Object deleted', fg=u'green', bold=True)
+
+    click.secho('Done', fg=u'green', bold=True)
