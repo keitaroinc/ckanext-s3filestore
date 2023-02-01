@@ -74,6 +74,14 @@ def resource_download(package_type, id, resource_id, filename=None):
                         'attachment; filename=' + filename,
                 }
                 url = upload.get_signed_url_to_key(key_path, params)
+
+            redir = redirect(url)
+            # remove Authorization header from redirect
+            # so that it doesn't get passed to S3
+            # (which doesn't like it)
+            redir.headers.pop('Authorization', None)
+            # remove Origin header because it causes problems with CORS on S3
+            redir.headers.pop('Origin', None)
             return redirect(url)
 
         except ClientError as ex:
