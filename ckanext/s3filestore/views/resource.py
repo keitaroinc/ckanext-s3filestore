@@ -82,7 +82,7 @@ def resource_download(package_type, id, resource_id, filename=None):
             redir.headers.pop('Authorization', None)
             # remove Origin header because it causes problems with CORS on S3
             redir.headers.pop('Origin', None)
-            return redirect(url)
+            return redir
 
         except ClientError as ex:
             if ex.response['Error']['Code'] in ['NoSuchKey', '404']:
