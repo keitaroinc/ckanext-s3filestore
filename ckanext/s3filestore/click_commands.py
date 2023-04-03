@@ -115,7 +115,7 @@ def upload_assets():
     uploaded_resources = []
     for resource_id, file_name in group_ids_and_paths.items():
         key = 'storage/uploads/group/{resource_id}'.format(resource_id=resource_id)
-        s3_connection.Object(bucket_name, key).put(Body=open(file_name, u'rb'))
+        s3_connection.Object(bucket_name, key).put(Body=open(file_name, u'rb'), ACL=acl)
         uploaded_resources.append(resource_id)
         click.secho( 'Uploaded resource {0} to S3'.format(file_name), fg=u'green', bold=True)
     
