@@ -121,7 +121,6 @@ def upload_assets():
         click.secho(
             'Uploaded resource {0} to S3'.format(file_name),
             fg=u'green', bold=True)
-    
     click.secho('Done, uploaded {0} resources to S3'.format(
         len(uploaded_resources)),
         fg=u'green', bold=True)
