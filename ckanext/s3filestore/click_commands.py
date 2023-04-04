@@ -7,18 +7,19 @@ from sqlalchemy.sql import text
 from ckantoolkit import config
 from ckanext.s3filestore.uploader import BaseS3Uploader
 
+storage_path = config.get('ckan.storage_path',
+                          '/var/lib/ckan/default/resources')
+sqlalchemy_url = config.get('sqlalchemy.url',
+                            'postgresql://user:pass@localhost/db')
+bucket_name = config.get('ckanext.s3filestore.aws_bucket_name')
+acl = config.get('ckanext.s3filestore.acl', 'public-read')
+
 
 @click.command(u's3-upload',
                short_help=u'Uploads all resources '
                           u'from "ckan.storage_path"'
                           u' to the configured s3 bucket')
 def upload_resources():
-    storage_path = config.get('ckan.storage_path',
-                              '/var/lib/ckan/default/resources')
-    sqlalchemy_url = config.get('sqlalchemy.url',
-                                'postgresql://user:pass@localhost/db')
-    bucket_name = config.get('ckanext.s3filestore.aws_bucket_name')
-    acl = config.get('ckanext.s3filestore.acl', 'public-read')
     resource_ids_and_paths = {}
 
     for root, dirs, files in os.walk(storage_path):
@@ -88,10 +89,6 @@ def upload_resources():
                           u'from "ckan.storage_path"'
                           u' to the configured s3 bucket')
 def upload_assets():
-    storage_path = config.get('ckan.storage_path',
-                              '/var/lib/ckan/default/resources')
-    bucket_name = config.get('ckanext.s3filestore.aws_bucket_name')
-    acl = config.get('ckanext.s3filestore.acl', 'public-read')
     group_ids_and_paths = {}
     for root, dirs, files in os.walk(storage_path):
         if root[-5:] == 'group':
