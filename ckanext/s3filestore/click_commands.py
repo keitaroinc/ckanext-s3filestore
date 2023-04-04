@@ -100,9 +100,6 @@ def upload_assets():
                 group_ids_and_paths[group_file]=os.path.join(root, files[idx])
 
     click.secho('Found {0} resource files in the file system'.format(len(group_ids_and_paths)), fg=u'green', bold=True)
-        
-    engine = create_engine(sqlalchemy_url)
-    connection = engine.connect()
 
     click.secho('{0} group assets found in the database'.format(
         len(group_ids_and_paths.keys())),
