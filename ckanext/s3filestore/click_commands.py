@@ -82,6 +82,7 @@ def upload_resources():
         fg=u'green',
         bold=True)
 
+
 @click.command(u's3-assets',
                short_help=u'Uploads all group assets '
                           u'from "ckan.storage_path"'
@@ -89,17 +90,18 @@ def upload_resources():
 def upload_assets():
     storage_path = config.get('ckan.storage_path',
                               '/var/lib/ckan/default/resources')
-    sqlalchemy_url = config.get('sqlalchemy.url',
-                                'postgresql://user:pass@localhost/db')
     bucket_name = config.get('ckanext.s3filestore.aws_bucket_name')
     acl = config.get('ckanext.s3filestore.acl', 'public-read')
     group_ids_and_paths = {}
     for root, dirs, files in os.walk(storage_path):
-        if root[-5:]=='group':
+        if root[-5:] == 'group':
             for idx, group_file in enumerate(files):
-                group_ids_and_paths[group_file]=os.path.join(root, files[idx])
-
-    click.secho('Found {0} resource files in the file system'.format(len(group_ids_and_paths)), fg=u'green', bold=True)
+                group_ids_and_paths[group_file] = os.path.join(
+                    root, files[idx])
+    click.secho('Found {0} resource files in the file system'.format(
+        len(group_ids_and_paths)),
+        fg=u'green',
+        bold=True)
 
     click.secho('{0} group assets found in the database'.format(
         len(group_ids_and_paths.keys())),
@@ -111,9 +113,15 @@ def upload_assets():
 
     uploaded_resources = []
     for resource_id, file_name in group_ids_and_paths.items():
-        key = 'storage/uploads/group/{resource_id}'.format(resource_id=resource_id)
-        s3_connection.Object(bucket_name, key).put(Body=open(file_name, u'rb'), ACL=acl)
+        key = 'storage/uploads/group/{resource_id}'.format(
+            resource_id=resource_id)
+        s3_connection.Object(bucket_name, key).put(
+            Body=open(file_name, u'rb'), ACL=acl)
         uploaded_resources.append(resource_id)
-        click.secho( 'Uploaded resource {0} to S3'.format(file_name), fg=u'green', bold=True)
+        click.secho(
+            'Uploaded resource {0} to S3'.format(file_name),
+            fg=u'green', bold=True)
     
-    click.secho('Done, uploaded {0} resources to S3'.format(len(uploaded_resources)), fg=u'green', bold=True)
+    click.secho('Done, uploaded {0} resources to S3'.format(
+        len(uploaded_resources)),
+        fg=u'green', bold=True)
