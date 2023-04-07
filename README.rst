@@ -118,6 +118,10 @@ CLI
 To upload all local resources located in `ckan.storage_path` location dir to the configured S3 bucket use::
 
     ckan -c /etc/ckan/default/ckan.ini s3-upload
+   
+To upload all local group/organization assets (pics) located in `ckan.storage_path` location dir to the configured S3 bucket use::
+
+   ckan -c /etc/ckan/default/ckan.ini s3-assets   
 
 
 ------------------------
