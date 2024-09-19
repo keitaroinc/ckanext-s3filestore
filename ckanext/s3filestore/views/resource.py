@@ -4,7 +4,7 @@ import logging
 import mimetypes
 
 import flask
-
+import requests
 from botocore.exceptions import ClientError
 
 from ckantoolkit import config as ckan_config
@@ -74,7 +74,9 @@ def resource_download(package_type, id, resource_id, filename=None):
                         'attachment; filename=' + filename,
                 }
                 url = upload.get_signed_url_to_key(key_path, params)
-            return redirect(url)
+            response = s3_download(url)
+                   
+            return response
 
         except ClientError as ex:
             if ex.response['Error']['Code'] in ['NoSuchKey', '404']:
@@ -97,6 +99,19 @@ def resource_download(package_type, id, resource_id, filename=None):
                 raise ex
     else:
         return redirect(rsc[u'url'])
+
+
+def s3_download(url):
+    s3_response = requests.get(url)  
+    response = flask.make_response(s3_response.content)
+    response.headers['Content-Type'] = s3_response.headers.get('Content-Type')
+    response.headers['Content-Disposition'] = s3_response.headers.get('Content-Disposition')
+    # Set CORS headers
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = '*'  
+
+    return response
 
 
 def filesystem_resource_download(package_type, id, resource_id, filename=None):
