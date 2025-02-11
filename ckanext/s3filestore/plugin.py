@@ -27,7 +27,6 @@ def sign_url(key_path):
         Params={'Bucket': BUCKET_NAME, 'Key': key_path, },
         ExpiresIn=3600,
         )
-    breakpoint()
     return url
 
 
@@ -107,9 +106,9 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
         
         if aws_bucket_url in resource_dict['url']:
 
-            key = resource_dict['url'].lstrip(aws_bucket_url)
-            url_signed = sign_url(key)
+            key_path = resource_dict['url'].replace(aws_bucket_url, "")
+            url_signed = sign_url(key_path)
 
             resource_dict['url'] = url_signed
         
-        return resource_dict
+        return
