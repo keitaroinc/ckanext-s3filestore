@@ -1,10 +1,34 @@
 # encoding: utf-8
 import ckan.plugins as plugins
 import ckantoolkit as toolkit
+import boto3
 
 import ckanext.s3filestore.uploader
 from ckanext.s3filestore.views import resource, uploads
 from ckanext.s3filestore.click_commands import upload_resources, upload_assets
+from ckantoolkit import config
+
+REGION_NAME = config.get('ckanext.s3filestore.region_name')
+AWS_ACCESS_KEY_ID = config.get('ckanext.s3filestore.aws_access_key_id')
+AWS_SECRET_ACCESS_KEY = config.get('ckanext.s3filestore.aws_secret_access_key')
+BUCKET_NAME = config.get('ckanext.s3filestore.aws_bucket_name')
+
+
+def sign_url(key_path):
+    s3_client = boto3.client(
+        's3',
+        region_name=REGION_NAME,
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    )
+
+    url = s3_client.generate_presigned_url(
+        'get_object',
+        Params={'Bucket': BUCKET_NAME, 'Key': key_path, },
+        ExpiresIn=3600,
+        )
+    breakpoint()
+    return url
 
 
 class S3FileStorePlugin(plugins.SingletonPlugin):
@@ -13,6 +37,7 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IUploader)
     plugins.implements(plugins.IBlueprint)
     plugins.implements(plugins.IClick)
+    plugins.implements(plugins.IResourceController, inherit=True)
 
     # IConfigurer
 
@@ -72,3 +97,19 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
 
     def get_commands(self):
         return [upload_resources, upload_assets]
+    
+    # IResourceController
+
+    def before_resource_show(self, resource_dict):
+        
+        aws_bucket_url = toolkit.config.get(
+            'ckanext.s3filestore.aws_bucket_url')
+        
+        if aws_bucket_url in resource_dict['url']:
+
+            key = resource_dict['url'].lstrip(aws_bucket_url)
+            url_signed = sign_url(key)
+
+            resource_dict['url'] = url_signed
+        
+        return resource_dict
