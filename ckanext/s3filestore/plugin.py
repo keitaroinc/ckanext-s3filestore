@@ -8,11 +8,12 @@ from ckanext.s3filestore.views import resource, uploads
 from ckanext.s3filestore.click_commands import upload_resources, upload_assets
 from ckantoolkit import config
 
+
 REGION_NAME = config.get('ckanext.s3filestore.region_name')
 AWS_ACCESS_KEY_ID = config.get('ckanext.s3filestore.aws_access_key_id')
 AWS_SECRET_ACCESS_KEY = config.get('ckanext.s3filestore.aws_secret_access_key')
 BUCKET_NAME = config.get('ckanext.s3filestore.aws_bucket_name')
-
+aws_bucket_url = toolkit.config.get('ckanext.s3filestore.aws_bucket_url')
 
 def sign_url(key_path):
     s3_client = boto3.client(
@@ -99,10 +100,13 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
     
     # IResourceController
 
-    def before_resource_show(self, resource_dict):
+    def before_resource_create(self, context, resource_dict):
+        if aws_bucket_url in resource_dict['url']:
+            resource_dict['url_bucket']=resource_dict['url']
         
-        aws_bucket_url = toolkit.config.get(
-            'ckanext.s3filestore.aws_bucket_url')
+        return resource_dict
+
+    def before_resource_show(self, resource_dict):
         
         if aws_bucket_url in resource_dict['url']:
 
@@ -110,5 +114,4 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
             url_signed = sign_url(key_path)
 
             resource_dict['url'] = url_signed
-        
-        return
+        return resource_dict
