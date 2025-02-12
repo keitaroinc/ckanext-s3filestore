@@ -2,11 +2,13 @@
 import ckan.plugins as plugins
 import ckantoolkit as toolkit
 import boto3
+import re
 
 import ckanext.s3filestore.uploader
 from ckanext.s3filestore.views import resource, uploads
 from ckanext.s3filestore.click_commands import upload_resources, upload_assets
 from ckantoolkit import config
+from datetime import datetime, timedelta
 
 
 REGION_NAME = config.get('ckanext.s3filestore.region_name')
@@ -14,6 +16,7 @@ AWS_ACCESS_KEY_ID = config.get('ckanext.s3filestore.aws_access_key_id')
 AWS_SECRET_ACCESS_KEY = config.get('ckanext.s3filestore.aws_secret_access_key')
 BUCKET_NAME = config.get('ckanext.s3filestore.aws_bucket_name')
 aws_bucket_url = toolkit.config.get('ckanext.s3filestore.aws_bucket_url')
+
 
 def sign_url(key_path):
     s3_client = boto3.client(
@@ -26,9 +29,19 @@ def sign_url(key_path):
     url = s3_client.generate_presigned_url(
         'get_object',
         Params={'Bucket': BUCKET_NAME, 'Key': key_path, },
-        ExpiresIn=3600,
+        ExpiresIn=604800,
         )
     return url
+
+
+def sigiture_expired(time):
+    dt = datetime.strptime(time, "%Y%m%dT%H%M%SZ")
+    expiry_time = dt + timedelta(days=7)
+    now = datetime.now()
+    if now > expiry_time:
+        return True
+    else:
+        return False
 
 
 class S3FileStorePlugin(plugins.SingletonPlugin):
@@ -114,4 +127,15 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
             url_signed = sign_url(key_path)
 
             resource_dict['url'] = url_signed
-        return resource_dict
+            return resource_dict
+        
+        m = re.search('Amz-Date=(.+?)&X-Amz-Expires', resource_dict['url'])
+        
+        if m:
+            key_path = resource_dict['url_bucket'].replace(aws_bucket_url, "")
+            url_signed = sign_url(key_path)
+            resource_dict['url'] = url_signed
+            return resource_dict
+        else:
+            return resource_dict
+    
