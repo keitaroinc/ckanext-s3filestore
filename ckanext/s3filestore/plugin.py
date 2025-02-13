@@ -142,5 +142,11 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
                 return resource_dict
         else:
             return resource_dict
+    
+    def after_resource_update(self, context, resource_dict):
+        
+        resource_dict['url_bucket'] = resource_dict['url']
+        
+        return resource_dict
 
     
