@@ -115,7 +115,7 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
 
     def before_resource_create(self, context, resource_dict):
         if aws_bucket_url in resource_dict['url']:
-            resource_dict['url_bucket']=resource_dict['url']
+            resource_dict['url_bucket'] = resource_dict['url']
         
         return resource_dict
 
@@ -132,10 +132,15 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
         m = re.search('Amz-Date=(.+?)&X-Amz-Expires', resource_dict['url'])
         
         if m:
-            key_path = resource_dict['url_bucket'].replace(aws_bucket_url, "")
-            url_signed = sign_url(key_path)
-            resource_dict['url'] = url_signed
-            return resource_dict
+            time = m.group(1)
+            if sigiture_expired(time) is True:
+                key_path = resource_dict['url_bucket'].replace(aws_bucket_url, "")
+                url_signed = sign_url(key_path)
+                resource_dict['url'] = url_signed
+                return resource_dict
+            else:
+                return resource_dict
         else:
             return resource_dict
+
     
