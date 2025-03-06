@@ -3,12 +3,13 @@ import ckan.plugins as plugins
 import ckantoolkit as toolkit
 import boto3
 import re
-
+import urllib.parse
 import ckanext.s3filestore.uploader
 from ckanext.s3filestore.views import resource, uploads
 from ckanext.s3filestore.click_commands import upload_resources, upload_assets
 from ckantoolkit import config
 from datetime import datetime, timedelta
+from urllib.parse import unquote_plus
 
 
 REGION_NAME = config.get('ckanext.s3filestore.region_name')
@@ -123,7 +124,9 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
         
         if aws_bucket_url in resource_dict['url']:
 
-            key_path = resource_dict['url'].replace(aws_bucket_url, "")
+            parsed_url = urllib.parse.urlparse(resource_dict['url'])
+            path = parsed_url.path.lstrip('/')
+            key_path = unquote_plus(urllib.parse.unquote(path))
             url_signed = sign_url(key_path)
 
             resource_dict['url'] = url_signed
@@ -134,19 +137,17 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
         if m:
             time = m.group(1)
             if sigiture_expired(time) is True:
-                key_path = resource_dict['url_bucket'].replace(aws_bucket_url, "")
+                parsed_url = urllib.parse.urlparse(resource_dict['url_bucket'])
+                path = parsed_url.path.lstrip('/')
+                key_path = unquote_plus(urllib.parse.unquote(path))
                 url_signed = sign_url(key_path)
                 resource_dict['url'] = url_signed
+                
                 return resource_dict
             else:
                 return resource_dict
         else:
             return resource_dict
     
-    def after_resource_update(self, context, resource_dict):
-        
-        resource_dict['url_bucket'] = resource_dict['url']
-        
-        return resource_dict
 
     
