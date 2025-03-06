@@ -37,7 +37,7 @@ def sign_url(key_path):
 
 def sigiture_expired(time):
     dt = datetime.strptime(time, "%Y%m%dT%H%M%SZ")
-    expiry_time = dt + timedelta(days=7)
+    expiry_time = dt + timedelta(days=6)
     now = datetime.now()
     if now > expiry_time:
         return True
