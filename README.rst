@@ -70,6 +70,7 @@ Required::
     ckanext.s3filestore.aws_bucket_name = a-bucket-to-store-your-stuff
     ckanext.s3filestore.region_name= region-name
     ckanext.s3filestore.signature_version = s3v4
+    ckanext.s3filestore.aws_bucket_url= https://link-to-a-bucket.s3.us-east-2.amazonaws.com/
 
 Conditional::
 
