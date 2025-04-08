@@ -183,8 +183,6 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
                 key_path = unquote_plus(urllib.parse.unquote(path))
                 url_signed = sign_url(key_path)
                 resource_dict['url'] = url_signed
-                resource_dict['original_url'] = url_signed
-                resource_dict['tintiri'] = url_signed
                 print("===================================================")
                 print("url is signed")
 
