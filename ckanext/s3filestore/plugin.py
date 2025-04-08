@@ -40,8 +40,15 @@ def sigiture_expired(time):
     expiry_time = dt + timedelta(days=6)
     now = datetime.now()
     if now > expiry_time:
+        print("===================================================")
+        print("signiture has expired")
+        print("===================================================")
         return True
+    
     else:
+        print("===================================================")
+        print("signiture has not expired")
+        print("===================================================")
         return False
 
 
@@ -137,14 +144,24 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
         if m:
             time = m.group(1)
             if sigiture_expired(time) is True:
+                print("===================================================")
+                print("url is going to be signed")
+                print("===================================================")
                 parsed_url = urllib.parse.urlparse(resource_dict['url_bucket'])
                 path = parsed_url.path.lstrip('/')
                 key_path = unquote_plus(urllib.parse.unquote(path))
                 url_signed = sign_url(key_path)
                 resource_dict['url'] = url_signed
-                
+                resource_dict['original_url'] = url_signed
+                print("===================================================")
+                print("url is signed")
+
+                print("===================================================")
                 return resource_dict
             else:
+                print("===================================================")
+                print("url is not signed")
+                print("===================================================")
                 return resource_dict
         else:
             return resource_dict
