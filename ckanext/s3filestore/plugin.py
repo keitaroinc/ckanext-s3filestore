@@ -2,14 +2,13 @@
 import ckan.plugins as plugins
 import ckantoolkit as toolkit
 import boto3
-import re
 import urllib.parse
+from urllib.parse import urlparse, parse_qs, unquote_plus
 import ckanext.s3filestore.uploader
 from ckanext.s3filestore.views import resource, uploads
 from ckanext.s3filestore.click_commands import upload_resources, upload_assets
 from ckantoolkit import config
-from datetime import datetime, timedelta
-from urllib.parse import unquote_plus
+from datetime import datetime, timedelta, timezone
 
 
 REGION_NAME = config.get('ckanext.s3filestore.region_name')
@@ -35,20 +34,55 @@ def sign_url(key_path):
     return url
 
 
-def sigiture_expired(time):
-    dt = datetime.strptime(time, "%Y%m%dT%H%M%SZ")
-    expiry_time = dt + timedelta(days=6)
-    now = datetime.now()
-    if now > expiry_time:
-        print("===================================================")
-        print("signiture has expired")
-        print("===================================================")
-        return True
-    
-    else:
-        print("===================================================")
-        print("signiture has not expired")
-        print("===================================================")
+def is_presigned_s3_url(url: str) -> bool:
+    try:
+        parsed_url = urlparse(url)
+        query_params = parse_qs(parsed_url.query)
+
+        # Basic checks
+        is_s3 = 's3.amazonaws.com' in parsed_url.netloc
+        has_signature = any(k in query_params for k in [
+            'X-Amz-Signature',        # AWS Signature V4
+            'Signature'               # Legacy (V2)
+        ])
+        has_key = any(k in query_params for k in [
+            'X-Amz-Credential',
+            'AWSAccessKeyId'
+        ])
+        has_expiry = any(k in query_params for k in [
+            'X-Amz-Expires',
+            'Expires'
+        ])
+
+        return is_s3 and has_signature and has_key and has_expiry
+    except Exception:
+        return False
+
+
+def sigiture_expired(url: str) -> bool:
+    try:
+        parsed_url = urlparse(url)
+        query_params = parse_qs(parsed_url.query)
+
+        # Check for AWS Signature Version 2 (uses 'Expires')
+        if 'Expires' in query_params:
+            expires_timestamp = int(query_params['Expires'][0])
+            expiry_time = datetime.fromtimestamp(expires_timestamp, tz=timezone.utc)
+            return datetime.now(timezone.utc) > expiry_time
+
+        # Check for AWS Signature Version 4 (uses 'X-Amz-Date' + 'X-Amz-Expires')
+        if 'X-Amz-Date' in query_params and 'X-Amz-Expires' in query_params:
+            amz_date_str = query_params['X-Amz-Date'][0]
+            expires_in = int(query_params['X-Amz-Expires'][0])
+            
+            request_time = datetime.strptime(amz_date_str, "%Y%m%dT%H%M%SZ").replace(tzinfo=timezone.utc)
+            expiry_time = request_time + timedelta(seconds=expires_in)
+            return datetime.now(timezone.utc) > expiry_time
+
+        # If neither present, we can't determine expiration
+        return False
+    except Exception as e:
+        print(f"Error: {e}")
         return False
 
 
@@ -139,11 +173,8 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
             resource_dict['url'] = url_signed
             return resource_dict
         
-        m = re.search('Amz-Date=(.+?)&X-Amz-Expires', resource_dict['url'])
-        
-        if m:
-            time = m.group(1)
-            if sigiture_expired(time) is True:
+        if is_presigned_s3_url(resource_dict['url']):
+            if sigiture_expired(resource_dict['url']):
                 print("===================================================")
                 print("url is going to be signed")
                 print("===================================================")
@@ -153,6 +184,7 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
                 url_signed = sign_url(key_path)
                 resource_dict['url'] = url_signed
                 resource_dict['original_url'] = url_signed
+                resource_dict['tintiri'] = url_signed
                 print("===================================================")
                 print("url is signed")
 
