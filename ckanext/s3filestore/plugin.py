@@ -2,6 +2,7 @@
 import ckan.plugins as plugins
 import ckantoolkit as toolkit
 import boto3
+from botocore.config import Config
 import urllib.parse
 from urllib.parse import urlparse, parse_qs, unquote_plus
 import ckanext.s3filestore.uploader
@@ -24,6 +25,7 @@ def sign_url(key_path):
         region_name=REGION_NAME,
         aws_access_key_id=AWS_ACCESS_KEY_ID,
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        config=Config(signature_version='s3v4')
     )
 
     url = s3_client.generate_presigned_url(
