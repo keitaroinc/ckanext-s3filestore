@@ -177,23 +177,13 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
         
         if is_presigned_s3_url(resource_dict['url']):
             if sigiture_expired(resource_dict['url']):
-                print("===================================================")
-                print("url is going to be signed")
-                print("===================================================")
                 parsed_url = urllib.parse.urlparse(resource_dict['url_bucket'])
                 path = parsed_url.path.lstrip('/')
                 key_path = unquote_plus(urllib.parse.unquote(path))
                 url_signed = sign_url(key_path)
                 resource_dict['url'] = url_signed
-                print("===================================================")
-                print("url is signed")
-
-                print("===================================================")
                 return resource_dict
             else:
-                print("===================================================")
-                print("url is not signed")
-                print("===================================================")
                 return resource_dict
         else:
             return resource_dict
