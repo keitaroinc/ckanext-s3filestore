@@ -29,13 +29,11 @@ redirect = toolkit.redirect_to
 
 s3_resource = Blueprint(
     u's3_resource',
-    __name__,
-    url_prefix=u'/dataset/<id>/resource',
-    url_defaults={u'package_type': u'dataset'}
+    __name__
 )
 
 
-def resource_download(package_type, id, resource_id, filename=None):
+def resource_download(id, resource_id, filename=None):
     '''
     Provide a download by either redirecting the user to the url stored or
     downloading the uploaded file from S3.
@@ -99,7 +97,7 @@ def resource_download(package_type, id, resource_id, filename=None):
         return redirect(rsc[u'url'])
 
 
-def filesystem_resource_download(package_type, id, resource_id, filename=None):
+def filesystem_resource_download(id, resource_id, filename=None):
     """
     A fallback view action to download resources from the
     filesystem. A copy of the action from
@@ -140,9 +138,17 @@ def filesystem_resource_download(package_type, id, resource_id, filename=None):
     return redirect(rsc[u'url'])
 
 
-s3_resource.add_url_rule(u'/<resource_id>/download',
+s3_resource.add_url_rule("/financial_data/<id>/resource/<resource_id>/download",
                          view_func=resource_download)
-s3_resource.add_url_rule(u'/<resource_id>/download/<filename>',
+s3_resource.add_url_rule("/netex_data/<id>/resource/<resource_id>/download",
+                         view_func=resource_download)
+s3_resource.add_url_rule("/txc_data/<id>/resource/<resource_id>/download",
+                         view_func=resource_download)
+s3_resource.add_url_rule("/financial_data/<id>/resource/<resource_id>/download/<filename>",
+                         view_func=resource_download)
+s3_resource.add_url_rule("/netex_data/<id>/resource/resource_id>/download/<filename>",
+                         view_func=resource_download)
+s3_resource.add_url_rule("/txc_data/<id>/resource/<resource_id>/download/<filename>",
                          view_func=resource_download)
 s3_resource.add_url_rule(u'/<resource_id>/fs_download/<filename>',
                          view_func=filesystem_resource_download)
