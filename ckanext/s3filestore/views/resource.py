@@ -138,18 +138,17 @@ def filesystem_resource_download(id, resource_id, filename=None):
     return redirect(rsc[u'url'])
 
 
-s3_resource.add_url_rule("/financial_data/<id>/resource/<resource_id>/download",
-                         view_func=resource_download)
-s3_resource.add_url_rule("/netex_data/<id>/resource/<resource_id>/download",
-                         view_func=resource_download)
-s3_resource.add_url_rule("/txc_data/<id>/resource/<resource_id>/download",
-                         view_func=resource_download)
-s3_resource.add_url_rule("/financial_data/<id>/resource/<resource_id>/download/<filename>",
-                         view_func=resource_download)
-s3_resource.add_url_rule("/netex_data/<id>/resource/resource_id>/download/<filename>",
-                         view_func=resource_download)
-s3_resource.add_url_rule("/txc_data/<id>/resource/<resource_id>/download/<filename>",
-                         view_func=resource_download)
+dataset_types = ["dataset", "financial_data", "netex_data", "txc_data"]
+
+for dataset in dataset_types:
+    s3_resource.add_url_rule(
+        f"/{dataset}/<id>/resource/<resource_id>/download",
+        view_func=resource_download
+    )
+    s3_resource.add_url_rule(
+        f"/{dataset}/<id>/resource/<resource_id>/download/<filename>",
+        view_func=resource_download
+    )
 s3_resource.add_url_rule(u'/<resource_id>/fs_download/<filename>',
                          view_func=filesystem_resource_download)
 
