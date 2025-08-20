@@ -7,6 +7,7 @@ from ckanext.s3filestore.views import resource, uploads
 from ckanext.s3filestore.click_commands import upload_resources, upload_assets
 
 
+@toolkit.blanket.config_declarations
 class S3FileStorePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IConfigurable)
