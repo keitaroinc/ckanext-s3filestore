@@ -9,11 +9,9 @@
 .. image:: https://coveralls.io/repos/github/keitaroinc/ckanext-s3filestore/badge.svg?branch=main
      :target: https://coveralls.io/github/keitaroinc/ckanext-s3filestore?branch=main
 
-.. image:: https://img.shields.io/badge/python-3.8-blue.svg
-    :target: https://www.python.org/downloads/release/python-384/
+.. image:: https://img.shields.io/badge/python-3.9%20|%203.10%20-blue
+    :target: https://www.python.org/downloads/
 
-.. image:: https://img.shields.io/pypi/v/ckanext-s3filestore
-    :target: https://pypi.org/project/ckanext-s3filestore
 
 
 
@@ -30,7 +28,9 @@ Use Amazon S3 or Minio<https://minio.io/> as a filestore for resources.
 Requirements
 ------------
 
-Requires CKAN 2.9+
+Requires CKAN 2.10+
+
+When installing this extension on CKAN 2.9 please use `v1.0.2` tag
 
 When installing this extension on CKAN versions prior 2.9 please use `ckan-2.8 <https://github.com/keitaroinc/ckanext-s3filestore/tree/ckan-2.8>`_ branch.
 
