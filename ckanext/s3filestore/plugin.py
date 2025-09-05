@@ -7,7 +7,6 @@ from ckanext.s3filestore.views import resource, uploads
 from ckanext.s3filestore.click_commands import upload_resources, upload_assets
 
 
-@toolkit.blanket.config_declarations
 class S3FileStorePlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IConfigurable)
@@ -73,3 +72,7 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
 
     def get_commands(self):
         return [upload_resources, upload_assets]
+
+
+if toolkit.check_ckan_version(min_version="2.11"):
+    S3FileStorePlugin = toolkit.blanket.config_declarations(S3FileStorePlugin)
