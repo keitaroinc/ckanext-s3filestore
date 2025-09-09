@@ -12,6 +12,9 @@
 .. image:: https://img.shields.io/badge/python-3.8%20|%203.9%20|%203.10%20-blue
     :target: https://www.python.org/downloads/
 
+.. image:: https://img.shields.io/badge/ckan-2.9%20|%202.10%20|%202.11-yellow
+    :target: https://www.ckan.org/
+
 
 
 
