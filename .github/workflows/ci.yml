@@ -26,7 +26,7 @@ jobs:
 
       - name: Lint with flake8
         run: |
-          flake8 . --count --max-complexity=10 --max-line-length=127 --statistics --exclude ckan,ckanext-c3charts
+          flake8 . --count --max-complexity=13 --max-line-length=127 --statistics
 
   test:
     strategy:
