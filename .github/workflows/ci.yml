@@ -35,7 +35,7 @@ jobs:
         ckan-version: ["2.10", "2.11"]
       fail-fast: false
 
-    name: CKAN ${{ matrix.ckan-version }} Python ${{matrix.python-version}}
+    name: CKAN ${{ matrix.ckan-version }} Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     container:
       image: ckan/ckan-dev:${{ matrix.ckan-version }}
@@ -49,9 +49,13 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
       redis:
-          image: redis:3
+        image: redis:3
       moto:
         image: motoserver/moto:latest
         ports:
@@ -68,14 +72,37 @@ jobs:
       CKAN_DATASTORE_READ_URL: postgresql://datastore_read:pass@postgres/datastore_test
       CKAN_SOLR_URL: http://solr:8983/solr/ckan
       CKAN_REDIS_URL: redis://redis:6379/1
+      CKANEXT_S3FILESTORE__HOST_NAME: http://moto:5000
+      AWS_ACCESS_KEY_ID: test-access-key
+      AWS_SECRET_ACCESS_KEY: test-secret-key
+      AWS_DEFAULT_REGION: us-east-1
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Install requirements
-      run: |
-        pip install -e .
-        # Replace default path to CKAN core config file with the one on the container
-        sed -i -e 's/use = config:.*/use = config:\/srv\/app\/src\/ckan\/test-core.ini/' test.ini
-    - name: Run all tests
-      run: pytest --ckan-ini=test.ini --disable-warnings ckanext/s3filestore/tests
+      - uses: actions/checkout@v4
+
+      - name: Install requirements
+        run: |
+          pip install -e .
+          pip install boto3
+          # Replace default path to CKAN core config file with the one on the container
+          sed -i -e 's/use = config:.*/use = config:\/srv\/app\/src\/ckan\/test-core.ini/' test.ini
+
+      - name: Create S3 bucket in Moto
+        run: |
+          python - <<'EOF'
+          import boto3, os
+          s3 = boto3.client(
+              "s3",
+              endpoint_url=os.environ["CKANEXT_S3FILESTORE__HOST_NAME"],
+              aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+              aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+              region_name=os.environ["AWS_DEFAULT_REGION"],
+          )
+          s3.create_bucket(Bucket="test-bucket")
+          print("✅ Created test-bucket in Moto")
+          EOF
+
+      - name: Run all tests
+        run: pytest --ckan-ini=test.ini --disable-warnings ckanext/s3filestore/tests
+
 
