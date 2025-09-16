@@ -49,9 +49,11 @@ def test_view_shown_for_url_type_upload(app, create_with_upload):
 
     response = app.get(url)
 
-    # assert (u'/dataset/{0}/resource/{1}/download?preview=True'
-    #         .format(dataset[u'name'], resource[u'id'])
-    #         in response.text)
+    formatted_url = '/dataset/{0}/resource/{1}/download'.format(
+    dataset['id'], resource['id']
+    )
+    assert formatted_url in response.body, f"{formatted_url} not found in response"
+
 
     resource_view_src = app.get(resource_view_src_url,
                                 follow_redirects=False)
