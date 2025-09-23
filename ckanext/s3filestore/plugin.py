@@ -72,3 +72,7 @@ class S3FileStorePlugin(plugins.SingletonPlugin):
 
     def get_commands(self):
         return [upload_resources, upload_assets]
+
+
+if toolkit.check_ckan_version(min_version="2.10"):
+    S3FileStorePlugin = toolkit.blanket.config_declarations(S3FileStorePlugin)

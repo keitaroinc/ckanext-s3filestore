@@ -9,11 +9,12 @@
 .. image:: https://coveralls.io/repos/github/keitaroinc/ckanext-s3filestore/badge.svg?branch=main
      :target: https://coveralls.io/github/keitaroinc/ckanext-s3filestore?branch=main
 
-.. image:: https://img.shields.io/badge/python-3.8-blue.svg
-    :target: https://www.python.org/downloads/release/python-384/
+.. image:: https://img.shields.io/badge/python-3.8%20|%203.9%20|%203.10%20-blue
+    :target: https://www.python.org/downloads/
 
-.. image:: https://img.shields.io/pypi/v/ckanext-s3filestore
-    :target: https://pypi.org/project/ckanext-s3filestore
+.. image:: https://img.shields.io/badge/ckan-2.9%20|%202.10%20|%202.11-yellow
+    :target: https://www.ckan.org/
+
 
 
 
