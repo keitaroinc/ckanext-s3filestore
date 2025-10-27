@@ -1,2 +1,2 @@
 include README.rst
-recursive-include ckanext/s3filestore *.html *.json *.js *.less *.css
+recursive-include ckanext/s3filestore *.html *.json *.js *.less *.css *.mo *.yml *.yaml *.config *.png *.jpeg *.svg *.po *.pot *.jpg *.map *.eot *.svg *.ttf *.woff *.woff2 *.ico
