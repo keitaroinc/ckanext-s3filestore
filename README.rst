@@ -83,6 +83,9 @@ Conditional::
 
 Optional::
 
+    # An optional role ARN that will be assumed when getting a session for S3
+    ckanext.s3filestore.aws_role = arn:aws:iam::123456789012:role/RoleName
+    
     # An optional path to prepend to keys
     ckanext.s3filestore.aws_storage_path = my-site-name
 

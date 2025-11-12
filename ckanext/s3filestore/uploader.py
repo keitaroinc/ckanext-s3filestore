@@ -48,6 +48,7 @@ class BaseS3Uploader(object):
         self.bucket_name = config.get('ckanext.s3filestore.aws_bucket_name')
         self.p_key = config.get('ckanext.s3filestore.aws_access_key_id')
         self.s_key = config.get('ckanext.s3filestore.aws_secret_access_key')
+        self.role = config.get('ckanext.s3filestore.aws_role', None)
         self.region = config.get('ckanext.s3filestore.region_name')
         self.signature = config.get('ckanext.s3filestore.signature_version')
         self.host_name = config.get('ckanext.s3filestore.host_name', None)
@@ -64,9 +65,20 @@ class BaseS3Uploader(object):
         return directory
 
     def get_s3_session(self):
-        return boto3.session.Session(aws_access_key_id=self.p_key,
-                                     aws_secret_access_key=self.s_key,
-                                     region_name=self.region)
+        session = boto3.session.Session(aws_access_key_id=self.p_key,
+                                        aws_secret_access_key=self.s_key,
+                                        region_name=self.region)
+        if self.role:
+            assumed_role_object = session.client('sts').assume_role(
+                RoleArn=self.role,
+                RoleSessionName="CkanExtS3Session")
+            credentials = assumed_role_object['Credentials']
+            return boto3.session.Session(
+                aws_access_key_id=credentials['AccessKeyId'],
+                aws_secret_access_key=credentials['SecretAccessKey'],
+                aws_session_token=credentials['SessionToken'],
+                region_name=self.region)
+        return session
 
     def get_s3_resource(self):
         return \
