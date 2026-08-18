@@ -83,6 +83,9 @@ Conditional::
 
 Optional::
 
+    # An optional role ARN that will be assumed when getting a session for S3
+    ckanext.s3filestore.aws_role = arn:aws:iam::123456789012:role/RoleName
+
     # An optional path to prepend to keys
     ckanext.s3filestore.aws_storage_path = my-site-name
 
@@ -123,6 +126,27 @@ To upload all local resources located in `ckan.storage_path` location dir to the
 To upload all local group/organization assets (pics) located in `ckan.storage_path` location dir to the configured S3 bucket use::
 
    ckan -c /etc/ckan/default/ckan.ini s3-assets   
+
+
+Known limitations of ``ckanext.s3filestore.aws_role``
+-----------------------------------------------------
+
+This option is off by default, and when it is unset the behaviour is unchanged.
+Before enabling it, be aware of two things:
+
+* The assumed session is not cached. ``get_s3_session()`` is called from
+  ``get_s3_resource()`` and ``get_s3_client()``, which run per operation, so
+  every upload, delete and signed URL triggers a fresh STS ``AssumeRole`` call.
+  On a busy site this adds latency and consumes the STS request quota.
+* Presigned URLs are signed with the temporary credentials, so they stop
+  working when the role session expires, regardless of
+  ``ckanext.s3filestore.signed_url_expiry``. Keep ``signed_url_expiry`` at or
+  below the maximum session duration of the role, otherwise links will appear
+  to expire early.
+
+A bad role ARN, or a trust policy that does not allow this principal, will
+raise on startup when ``ckanext.s3filestore.check_access_on_startup`` is
+enabled, rather than at the first upload.
 
 
 ------------------------
