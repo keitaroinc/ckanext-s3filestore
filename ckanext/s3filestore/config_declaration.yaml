@@ -45,3 +45,11 @@ groups:
             Indicates whether the S3 client should use the IAM role
             attached to the Amazon EC2 instance or authentication
             instead of explicit AWS credentials
+      - key: ckanext.s3filestore.aws_role
+        example: arn:aws:iam::123456789012:role/RoleName
+        default:
+        description: |
+            An optional ARN of an IAM role to assume via STS when creating the
+            S3 session. When set, temporary credentials for this role are used
+            instead of the configured access key, which limits the lifetime of
+            the credentials in use. When unset, the access key is used directly.

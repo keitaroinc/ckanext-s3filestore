@@ -68,9 +68,9 @@ class BaseS3Uploader(object):
         session = boto3.session.Session(aws_access_key_id=self.p_key,
                                         aws_secret_access_key=self.s_key,
                                         region_name=self.region)
-        if self.role:
+        if self.role and self.role.strip():
             assumed_role_object = session.client('sts').assume_role(
-                RoleArn=self.role,
+                RoleArn=self.role.strip(),
                 RoleSessionName="CkanExtS3Session")
             credentials = assumed_role_object['Credentials']
             return boto3.session.Session(
