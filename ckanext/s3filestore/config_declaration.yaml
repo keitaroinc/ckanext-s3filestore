@@ -1,0 +1,47 @@
+version: 1
+groups:
+  - annotation: ckanext-s3filestore settings
+    options:
+      - key: ckanext.s3filestore.aws_bucket_name
+        example: s3-filestore-test
+        default: 
+        description: |
+            Defines the name of the S3 bucket that serves as the CKAN storage
+            backend, used for persisting and managing all uploaded files
+        required: true
+      - key: ckanext.s3filestore.aws_access_key_id
+        example: Your-Access-Key-ID
+        default: 
+        description: |
+            Specifies the AWS Access Key ID used for
+            authenticating requests to the S3 bucket
+        required: true
+      - key: ckanext.s3filestore.aws_secret_access_key
+        example: Your-Secret-Access-Key
+        default: 
+        description: |
+            Specifies the AWS Secret Access Key associated with the IAM
+            credentials used to authenticate access to the S3 bucket.
+        required: true
+      - key: ckanext.s3filestore.region_name
+        example: us-east-2
+        default: 
+        description: |
+            Specifies the AWS region in which the target 
+            S3 bucket is provisioned
+        required: true
+      - key: ckanext.s3filestore.signature_version
+        example: s3v4
+        default: 
+        description: |
+            Defines the AWS Signature Version to be used for request authentication
+            when accessing the S3 bucket
+        required: true
+      - key: ckanext.s3filestore.aws_use_ami_role
+        example: true
+        type: bool
+        default: 
+        description: |
+            Indicates whether the S3 client should use the IAM role
+            attached to the Amazon EC2 instance or authentication
+            instead of explicit AWS credentials

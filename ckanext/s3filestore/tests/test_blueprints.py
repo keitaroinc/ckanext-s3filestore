@@ -7,6 +7,7 @@ import pytest
 from ckantoolkit import config
 import ckan.tests.factories as factories
 from ckan.lib.helpers import url_for
+import re
 
 
 @pytest.mark.usefixtures(u'clean_db', u'clean_index')
@@ -19,12 +20,12 @@ class TestS3Controller(object):
     def test_resource_download_url(self, resource_with_upload):
         u'''The resource url is expected for uploaded resource file.'''
 
-        expected_url = u'http://test.ckan.net/dataset/{0}/' \
+        expected_url = u'/dataset/{0}/' \
                        u'resource/{1}/download/test.csv'.\
             format(resource_with_upload[u'package_id'],
                    resource_with_upload[u'id'])
 
-        assert resource_with_upload['url'] == expected_url
+        assert re.sub(r'^https?://[^/]+', '', resource_with_upload['url']) == expected_url
 
     def test_resource_download(self, app, resource_with_upload):
         u'''When trying to download resource
